@@ -1,0 +1,70 @@
+[
+  {
+    "type": "Асфальтирование",
+    "conditions": {
+      "min_temp": "",
+      "max_temp": "",
+      "rainfall": false,
+      "snow": true
+    }
+  },
+  {
+    "type": "Оа",
+    "rainfall": true,
+    "snow": true,
+    "conditions": {
+      "min_temp": "-20",
+      "max_temp": "+30",
+      "rainfall": true
+    }
+  },
+  {
+    "type": "Оады",
+    "rainfall": false,
+    "snow": false,
+    "conditions": {
+      "min_temp": "-10",
+      "max_temp": "+10",
+      "rainfall": false
+    }
+  },
+  {
+    "type": "Эфээф",
+    "rainfall": true,
+    "snow": false,
+    "conditions": {
+      "min_temp": "Лсл",
+      "max_temp": "Да",
+      "rainfall": true
+    }
+  },
+  {
+    "type": "Лмд",
+    "rainfall": false,
+    "conditions": {
+      "min_temp": "Ьп",
+      "max_temp": "Ьпассч",
+      "rainfall": false,
+      "snow": true
+    }
+  },
+  {
+    "rainfall": true,
+    "type": "Лсла",
+    "conditions": {
+      "rainfall": true,
+      "snow": true,
+      "min_temp": "Оаоа",
+      "max_temp": "Лла"
+    }
+  },
+  {
+    "type": "Тсьс",
+    "conditions": {
+      "min_temp": "Тьа",
+      "max_temp": "Ььа",
+      "rainfall": false,
+      "snow": false
+    }
+  }
+]
