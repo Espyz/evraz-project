@@ -16,7 +16,7 @@ calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
 calendar = Calendar(RUSSIAN_LANGUAGE)
 
 #Создадим константу месяцев
-months = [ '', ' января ', ' февраля ', ' марта ', ' апреля ', ' мая ', ' июня ', ' июля ', ' августа ', ' сентября ', ' октября ', ' ноября ', ]
+months = [ '', ' января ', ' февраля ', ' марта ', ' апреля ', ' мая ', ' июня ', ' июля ', ' августа ', ' сентября ', ' октября ', ' ноября ' ]
 
 
 @bot.message_handler(content_types=['text'])
@@ -36,7 +36,7 @@ def get_text_messages(message):
         keyboard.add(button1, button2)
         now = datetime.datetime.now()
         newCalendar = calendar.create_calendar(
-                name=calendar_1.prefix, # Specify the NAME of your calendar
+                name=calendar_1.prefix, 
                 year=now.year,
                 month=now.month)
         bot.send_message(message.from_user.id, text='Привет! Добро пожаловать')
