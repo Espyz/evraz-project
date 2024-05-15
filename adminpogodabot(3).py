@@ -30,6 +30,19 @@ def add_employee_fio(message):
     bot.send_message(message.from_user.id, text='Введите должность сотрудника')
     bot.register_next_step_handler(message, add_employee_post)
 
+def remove_employer(message):
+    try:
+        file = open('employees.json', 'r', encoding='utf-8')
+        works = json.load(file)
+        file.close()
+        works.pop(int(message.text) - 1)
+        file = open('employees.json', 'w', encoding='utf-8')
+        json.dump(works, file, ensure_ascii=False)
+        file.close()
+    except:
+        pass
+    bot_start_window(message)
+
 
 def add_employee_post(message):
     global employee
@@ -66,6 +79,19 @@ def add_work_type(message):
     bot.send_message(message.from_user.id, text='Укажите ограничения для проведения работ')
     bot.send_message(message.from_user.id, text='Укажите минимальную температуру, допустимую для проведения работ')
     bot.register_next_step_handler(message, add_work_conditions_min_temp)
+
+def remove_work_type(message):
+    try:
+        file = open('work_types.json', 'r', encoding='utf-8')
+        works = json.load(file)
+        file.close()
+        works.pop(int(message.text) - 1)
+        file = open('work_types.json', 'w', encoding='utf-8')
+        json.dump(works, file, ensure_ascii=False)
+        file.close()
+    except:
+        pass
+    bot_start_window(message)
 
 
 def add_work_conditions_min_temp(message):
@@ -113,7 +139,6 @@ def edit_work_type(message):
     global conditions, work_type
 
     work_type['type'] = message.text
-    file = open('work_types.json', 'r', encoding='utf-8')
     text = 'Проверьте введенные данные:\n\n\n'
     if 'type' in work_type:
         text += 'Вид проводимых работ: ' + work_type['type'] + '\n\n\n'
@@ -136,13 +161,11 @@ def edit_work_type(message):
     buttonfile1 = types.InlineKeyboardButton(text='Редактировать', callback_data='edit_file')
     keyboard4.add(buttonfile, buttonfile1)
     bot.send_message(message.from_user.id, text=text, reply_markup=keyboard4)
-    file.close()
 
 
 def edit_min_temp(message):
     global conditions, keyboard4
     conditions['min_temp'] = message.text
-    file = open('work_types.json', 'r', encoding='utf-8')
     text = 'Проверьте введенные данные:\n\n\n'
     if 'type' in work_type:
         text += 'Вид проводимых работ: ' + work_type['type'] + '\n\n\n'
@@ -165,12 +188,10 @@ def edit_min_temp(message):
     buttonfile1 = types.InlineKeyboardButton(text='Редактировать', callback_data='edit_file')
     keyboard4.add(buttonfile, buttonfile1)
     bot.send_message(message.from_user.id, text=text, reply_markup=keyboard4)
-    file.close()
 
 def edit_max_temp(message):
     global conditions, keyboard4
     conditions['max_temp'] = message.text
-    file = open('work_types.json', 'r', encoding='utf-8')
     text = 'Проверьте введенные данные:\n\n\n'
     if 'type' in work_type:
         text += 'Вид проводимых работ: ' + work_type['type'] + '\n\n\n'
@@ -193,12 +214,10 @@ def edit_max_temp(message):
     buttonfile1 = types.InlineKeyboardButton(text='Редактировать', callback_data='edit_file')
     keyboard4.add(buttonfile, buttonfile1)
     bot.send_message(message.from_user.id, text=text, reply_markup=keyboard4)
-    file.close() 
 
 def edit_rainfall(message):
     global conditions, keyboard4, keyboard1
     conditions['rainfall'] = keyboard1.callback_data
-    file = open('work_types.json', 'r', encoding='utf-8')
     text = 'Проверьте введенные данные:\n\n\n'
     if 'type' in work_type:
         text += 'Вид проводимых работ: ' + work_type['type'] + '\n\n\n'
@@ -221,12 +240,10 @@ def edit_rainfall(message):
     buttonfile1 = types.InlineKeyboardButton(text='Редактировать', callback_data='edit_file')
     keyboard4.add(buttonfile, buttonfile1)
     bot.send_message(message.from_user.id, text=text, reply_markup=keyboard4)
-    file.close()
 
 def edit_snow(message):
     global conditions, keyboard4
     conditions['snow'] = keyboard2.callback_data
-    file = open('work_types.json', 'r', encoding='utf-8')
     text = 'Проверьте введенные данные:\n\n\n'
     if 'type' in work_type:
         text += 'Вид проводимых работ: ' + work_type['type'] + '\n\n\n'
@@ -249,12 +266,12 @@ def edit_snow(message):
     buttonfile1 = types.InlineKeyboardButton(text='Редактировать', callback_data='edit_file')
     keyboard4.add(buttonfile, buttonfile1)
     bot.send_message(message.from_user.id, text=text, reply_markup=keyboard4)
-    file.close()
 
 def add_date_start(message):
     global date, work_type, index_global
     file = open('work_types.json', 'r', encoding='utf-8')
     work_types = json.load(file)
+    file.close()
     index_global = int(message.text) - 1
     # work_types[index]['type'] in work_types
     work_type = work_types[index_global]
@@ -266,39 +283,52 @@ def add_date_start(message):
 
 def add_date_end(message):
     global work_type
-    work_type['date_start'] = message.text
-    bot.send_message(message.from_user.id, text='Укажите дату окончания проведения работ в формате дд.мм.гггг')
-    bot.register_next_step_handler(message, all_employees)
+    try: 
+        datetime.strptime(message.text, '%d.%m.%Y')
+        work_type['date_start'] = message.text
+        bot.send_message(message.from_user.id, text='Укажите дату окончания проведения работ в формате дд.мм.гггг')
+        bot.register_next_step_handler(message, all_employees)
+    except:
+        bot.send_message(message.from_user.id, text='Неверный формат даты. Укажите дату начала проведения работ в формате дд.мм.гггг')
+        bot.register_next_step_handler(message, add_date_end)
 
 def all_employees(message):
     global employees, employee, work_type
-    work_type['date_end'] = message.text
-    text = 'Выберите ответственного сотрудника (в сообщении отправьте только номер)\n\n\n'
-    file1 = open('employees.json', 'r', encoding='utf-8')
-    employees = json.load(file1)
-    print(employees)
-    for i in range(len(employees)):
-        text += str(i + 1) + '. ' + employees[i]['fio'] + '\n\n'
-    bot.send_message(message.from_user.id, text=text)
-    bot.register_next_step_handler(message, head_employee)
-    file1.close()
+    try:
+        datetime.strptime(message.text, '%d.%m.%Y')
+        work_type['date_end'] = message.text
+        text = 'Выберите ответственного сотрудника (в сообщении отправьте только номер)\n\n\n'
+        file1 = open('employees.json', 'r', encoding='utf-8')
+        employees = json.load(file1)
+        print(employees)
+        for i in range(len(employees)):
+            text += str(i + 1) + '. ' + employees[i]['fio'] + '\n\n'
+        bot.send_message(message.from_user.id, text=text)
+        bot.register_next_step_handler(message, head_employee)
+        file1.close()
+    except:
+        bot.send_message(message.from_user.id, text='Неверный формат даты. Укажите дату начала проведения работ в формате дд.мм.гггг')
+        bot.register_next_step_handler(message, all_employees)
 
 def head_employee(message):
     global index_global
-    file = open('employees.json', 'r', encoding='utf-8')
-    employees = json.load(file)
-    index = int(message.text) - 1
-    employee = employees[index]
-    work_type['employer'] = employee
-    file.close()
-    file = open('work_types.json', 'r', encoding='utf-8')
-    work_types = json.load(file)
-    work_types[index_global] = work_type
-    file.close()
-    file = open('work_types.json', 'w', encoding='utf-8')
-    json.dump(work_types, file, ensure_ascii=False)
-    file.close()
-    bot.send_message(message.from_user.id, text='Успешно')
+    try:
+        file = open('employees.json', 'r', encoding='utf-8')
+        employees = json.load(file)
+        file.close()
+        index = int(message.text) - 1
+        employee = employees[index]
+        work_type['employer'] = employee
+        file = open('work_types.json', 'r', encoding='utf-8')
+        work_types = json.load(file)
+        work_types[index_global] = work_type
+        file.close()
+        file = open('work_types.json', 'w', encoding='utf-8')
+        json.dump(work_types, file, ensure_ascii=False)
+        file.close()
+        bot.send_message(message.from_user.id, text='Успешно')
+    except:
+        pass
     bot_start_window(message)
 
 def edit_grafik(message):
@@ -321,8 +351,8 @@ def edit_grafik(message):
 def bot_start_window(message):
     keyboard = types.InlineKeyboardMarkup()
     button1 = types.InlineKeyboardButton(text='Вид проводимых работ', callback_data='Вид проводимых работ')
-    button2 = types.InlineKeyboardButton(text='Ответсвенного сотрудника',
-                                         callback_data='Ответсвенного сотрудника')
+    button2 = types.InlineKeyboardButton(text='Ответственного сотрудника',
+                                         callback_data='Ответственного сотрудника')
     button3 = types.InlineKeyboardButton(text='График проведения работ',
                                          callback_data='График проведения работ')
 
@@ -332,12 +362,16 @@ def bot_start_window(message):
                      reply_markup=keyboard)
 
 def works(message):
-    print('ВТФ')
     file = open('work_types.json', 'r', encoding='utf-8')
-    if file.read() != '':
+    file_text = file.read()
+    print(file_text)
+    if file_text != '':
         file.seek(0)
         work_types = json.load(file)
+        file.close()
     else:
+        print('А мы на рофле')
+        file.close()
         return   
     if len(work_types) > 0:
         text = 'Текущий список проводимых работ:\n\n'
@@ -376,11 +410,11 @@ def works(message):
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
-    print(message)
     global keyboard1, keyboard2
     # Проверка на доступ пользователя
     file = open('admins.json', 'r', encoding='utf-8')
     admins = json.load(file)
+    file.close()
     if str(message.from_user.id) not in admins.keys():
         bot.send_message(message.from_user.id, text='У Вас нет доступа')
     else:
@@ -394,8 +428,8 @@ def get_text_messages(message):
             )
             keyboard = types.InlineKeyboardMarkup()
             button1 = types.InlineKeyboardButton(text='Вид проводимых работ', callback_data='Вид проводимых работ')
-            button2 = types.InlineKeyboardButton(text='Ответсвенного сотрудника',
-                                                 callback_data='Ответсвенного сотрудника')
+            button2 = types.InlineKeyboardButton(text='Ответственного сотрудника',
+                                                 callback_data='Ответственного сотрудника')
             button3 = types.InlineKeyboardButton(text='График проведения работ',
                                                  callback_data='График проведения работ')
 
@@ -424,16 +458,64 @@ def get_text_messages(message):
 # Функция обработки нажатия на кнопку
 def callback_worker(call):
     global work_type, keyboard1, keyboard2, keyboard3, is_edit, keyboard
-
     if call.data == 'Вид проводимых работ':
-        bot.send_message(call.message.chat.id, text='Добавьте вид проводимых работ')
-        bot.send_message(call.message.chat.id, text='Введите название вида работ')
-        bot.register_next_step_handler(call.message, add_work_type)
+        keyboard = types.InlineKeyboardMarkup()
+        button1 = types.InlineKeyboardButton(text='Добавить', callback_data='add_work_type')
+        button2 = types.InlineKeyboardButton(text='Удалить', callback_data='remove_work_type')
+        keyboard.add(button1, button2)
+        bot.send_message(call.message.chat.id, text='Выберите что хотите сделать', reply_markup=keyboard)
 
-    elif call.data == 'Ответсвенного сотрудника':
+    elif call.data == 'Ответственного сотрудника':
+        keyboard = types.InlineKeyboardMarkup()
+        button1 = types.InlineKeyboardButton(text='Добавить', callback_data='add_empl')
+        button2 = types.InlineKeyboardButton(text='Удалить', callback_data='remove_empl')
+        keyboard.add(button1, button2)
+        bot.send_message(call.message.chat.id, text='Выберите что хотите сделать', reply_markup=keyboard)
+    elif call.data == 'add_empl':
         bot.send_message(call.message.chat.id, text='Добавьте ответственного сотрудника')
         bot.send_message(call.message.chat.id, text='Введите ФИО ответственного сотрудника')
         bot.register_next_step_handler(call.message, add_employee_fio)
+    elif call.data == 'remove_empl':
+        file = open('employees.json', 'r', encoding='utf-8')
+        file_text = file.read()
+        file.seek(0)
+        if (file_text == '') or (file_text == '[]') :
+            file.close()
+            bot.send_message(call.message.chat.id, text='Сейчас нет проводимых работ')
+            bot_start_window(call)
+        else:
+            works = json.load(file)
+            file.close()
+            text = 'Введите тип проводимых работ. Только номер'
+            iter = 1
+            for work in works:
+                text += '\n' + str(iter) + '. ' + work['fio'] 
+                iter += 1              
+            bot.send_message(call.message.chat.id, text=text)
+            bot.register_next_step_handler(call.message, remove_employer)
+    elif call.data == 'add_work_type':
+        bot.send_message(call.message.chat.id, text='Добавьте вид проводимых работ')
+        bot.send_message(call.message.chat.id, text='Введите название вида работ')
+        bot.register_next_step_handler(call.message, add_work_type)
+    elif call.data == 'remove_work_type':
+        file = open('work_types.json', 'r', encoding='utf-8')
+        file_text = file.read()
+        file.seek(0)
+        if (file_text == '') or (file_text == '[]') :
+            file.close()
+            bot.send_message(call.message.chat.id, text='Сейчас нет проводимых работ')
+            bot_start_window(call)
+        else:
+            works = json.load(file)
+            file.close()
+            text = 'Введите тип проводимых работ. Только номер'
+            iter = 1
+            for work in works:
+                text += '\n' + str(iter) + '. ' + work['type'] 
+                iter += 1              
+            bot.send_message(call.message.chat.id, text=text)
+            bot.register_next_step_handler(call.message, remove_work_type)
+
 
     elif call.data == 'rainfall_true':
         conditions['rainfall'] = True
@@ -445,7 +527,6 @@ def callback_worker(call):
         if not is_edit:
             bot.send_message(call.message.chat.id, text='Уточните, возможно ли проведение работ в снег (Да/Нет)', reply_markup=keyboard2)
         else:
-            file = open('work_types.json', 'r', encoding='utf-8')
             text = 'Проверьте введенные данные:\n\n\n'
             if 'type' in work_type:
                 text += 'Вид проводимых работ: ' + work_type['type'] + '\n\n'
@@ -468,7 +549,6 @@ def callback_worker(call):
             buttonfile1 = types.InlineKeyboardButton(text='Редактировать', callback_data='edit_file')
             keyboard4.add(buttonfile, buttonfile1)
             bot.send_message(call.message.chat.id, text=text, reply_markup=keyboard4)
-            file.close()
 
 
     elif call.data == 'rainfall_false':
@@ -486,7 +566,6 @@ def callback_worker(call):
             conditions['snow'] = True
         else:
             conditions['snow'] = False
-        file = open('work_types.json', 'r', encoding='utf-8')
         text = 'Проверьте введенные данные:\n\n\n'
         if 'type' in work_type:
             text += 'Вид проводимых работ: ' + work_type['type'] + '\n\n'
@@ -509,7 +588,6 @@ def callback_worker(call):
         buttonfile1 = types.InlineKeyboardButton(text='Редактировать', callback_data='edit_file')
         keyboard4.add(buttonfile, buttonfile1)
         bot.send_message(call.message.chat.id, text=text, reply_markup=keyboard4)
-        file.close()
 
     if call.data == 'save_file':
         filesave = open('work_types.json', 'r', encoding='utf-8')
@@ -525,16 +603,7 @@ def callback_worker(call):
         json.dump(worktypes, filesave1, ensure_ascii=False)
         filesave1.close()
         bot.send_message(call.message.chat.id, text='Вид проводимых работ успешно сохранен')
-
-        keyboard = types.InlineKeyboardMarkup()
-        button1 = types.InlineKeyboardButton(text='Вид проводимых работ', callback_data='Вид проводимых работ')
-        button2 = types.InlineKeyboardButton(text='Ответсвенного сотрудника',
-                                             callback_data='Ответсвенного сотрудника')
-        button3 = types.InlineKeyboardButton(text='График проведения работ',
-                                             callback_data='График проведения работ')
-
-        keyboard.add(button1, button2, button3)
-        bot.send_message(call.message.chat.id, text="Выберите, что хотите добавить/редактировать", reply_markup=keyboard)
+        bot_start_window(call)
 
     if call.data == 'edit_file':
         is_edit = True
@@ -572,14 +641,12 @@ def callback_worker(call):
     elif call.data == 'График проведения работ':
         text = 'Выберите вид работ для изменения графика проведения (в сообщении отправьте только номер)\n\n\n'
         file1 = open('work_types.json', 'r', encoding='utf-8')
-        file2 = open('employees.json', 'r', encoding='utf-8')
         worktypes = json.load(file1)
+        file1.close()
         for i in range(len(worktypes)):
             text += str(i + 1) + '. ' + worktypes[i]['type'] + '\n\n'
         bot.send_message(call.message.chat.id, text=text)
         bot.register_next_step_handler(call.message, add_date_start)
-        file1.close()
-        file2.close()
 
     if call.data == 'edit_file':
         is_edit = True
@@ -587,7 +654,6 @@ def callback_worker(call):
         # edit_file_work_type1 = types.InlineKeyboardButton(text='Вид работ', callback_data='edit_file_work_type1')
         edit_file_date_start = types.InlineKeyboardButton(text='Начало', callback_data='edit_file_date_start')
         edit_file_date_end = types.InlineKeyboardButton(text='Конец', callback_data='edit_file_date_end')
-        # edit_file_head_employee = types.InlineKeyboardButton(text='Ответственный', callback_data='edit_file_head_employee')
 
     if call.data == 'save_file1':
         filesave = open('grafik.json', 'r', encoding='utf-8')
@@ -598,11 +664,6 @@ def callback_worker(call):
         filesave1.close()
         bot.send_message(call.message.chat.id, text='Вид проводимых работ успешно сохранен')
 
-
-    # if call.data == 'edit_file_work_type1':
-    #     bot.send_message(call.message.chat.id, text='Введите название вида работ')
-    #     bot.register_next_step_handler(call.message, edit_work_type)
-
     if call.data == 'edit_file_date_start':
         bot.send_message(call.message.chat.id, text='Укажите дату начало проведения работ')
         bot.register_next_step_handler(call.message, edit_min_temp)
@@ -610,10 +671,6 @@ def callback_worker(call):
     if call.data == 'edit_file_date_end':
         bot.send_message(call.message.chat.id, text='Укажите дату окончания проведения работ')
         bot.register_next_step_handler(call.message, edit_max_temp)
-
-    # if call.data == 'edit_file_head_employee':
-    #     bot.send_message(call.message.chat.id, text='Укажите ответственного сотрудника',  reply_markup=keyboard1)
-    #     bot.register_next_step_handler(call.message, edit_rainfall)
 
 def checkWeather():
     constparams = {
@@ -639,17 +696,54 @@ def periodicSendMessage():
                 file.seek(0)
                 work_types = json.load(file)
             file.close()
+
+            # Сообщение с прогнозом погоды на сегодняшний день
+            forecast = checkWeather()
+            textWeather = 'Прогноз погоды на сегодня: \n\n'
+            textWeather += 'Температура воздуха утром: ' + str(forecast['parts']['morning']['temp_avg']) + ' °C\n'
+            textWeather += 'Скорость ветра утром: ' + str(forecast['parts']['morning']["wind_speed"]) + ' м/с\n\n'
+            textWeather += 'Температура воздуха днём: ' + str(forecast['parts']['day']['temp_avg']) + ' °C\n'
+            textWeather += 'Скорость ветра днём: ' + str(forecast['parts']['day']["wind_speed"]) + ' м/с\n\n'
+            textWeather += 'Температура воздуха вечером: ' + str(forecast['parts']['evening']['temp_avg']) + ' °C\n'
+            textWeather += 'Скорость ветра вечером: ' + str(forecast['parts']['evening']["wind_speed"]) + ' м/с\n\n'
+            textWeather += 'Давление: ' + str(forecast['parts']['day']["pressure_mm"]) + ' мм рт. ст.\n\n'
+            textWeather += 'Влажность: ' + str(forecast['parts']['day']["humidity"]) + ' %\n\n'
+            textWeather += 'Время восхода: ' + str(forecast["sunrise"]) + '\n'
+            textWeather += 'Время заката: ' + str(forecast["sunset"]) + '\n\n\n\n'
+            avgTemp = forecast['parts']['day']['temp_avg']
+            condition = forecast['parts']['day']['condition']
             for work in work_types:
-                dateStart = datetime.strptime(work["date_start"], '%d.%m.%Y')
-                dateEnd = datetime.strptime(work["date_end"], '%d.%m.%Y')
-                if (datetime.today().date() < dateStart.date()) or (datetime.today().date() > dateEnd.date()):
-                    continue
-                employer = work["employer"]
-                text = 'Здравствуйте, ' + employer["fio"] + ', напоминаем Вам, что сегодня Вам необходимо выполнить работу: ' + work["type"]
-                try:
-                    notify_bot.send_message(employer['link'], text)
-                except:
-                    continue
+                if 'employer' in work:
+                    dateStart = datetime.strptime(work["date_start"], '%d.%m.%Y')
+                    dateEnd = datetime.strptime(work["date_end"], '%d.%m.%Y')
+                    if (datetime.today().date() < dateStart.date()) or (datetime.today().date() > dateEnd.date()):
+                        continue
+                    employer = work["employer"]
+                    text = 'Здравствуйте, ' + employer["fio"] + ', напоминаем Вам, что сегодня Вам необходимо выполнить работу: ' + work["type"]
+                    work_success = True
+                    addedText = ''
+                    try:
+                        notify_bot.send_message(employer['link'], text)
+                        notify_bot.send_message(employer['link'], textWeather)
+                        # Сообщение с информацие по проведению работы 
+                        if (int(work['conditions']['min_temp']) > avgTemp) or (int(work['conditions']['max_temp']) > avgTemp):
+                            work_success = False
+                            if int(work['conditions']['min_temp']) > avgTemp:
+                                addedText += 'Температура не соответствует необходимой норме.\n Минимальная температура для выполнения работ: ' + str(work['conditions']['min_temp']) + '\nСегодняшняя средняя температура: ' + str(avgTemp) + '\n\n'
+                            else:
+                                addedText += 'Температура не соответствует необходимой норме.\n Максимальная температура для выполнения работ: ' + str(work['conditions']['max_temp']) + '\nСегодняшняя средняя температура: ' + str(avgTemp) + '\n\n'
+                        if condition in ['rain', 'light-rain', 'heavy-rain', 'showers', 'thunderstorm-with-rain', 'thunderstorm', 'wet-snow']:
+                            if not work['conditions']['rainfall']:
+                                work_success = False
+                                addedText += 'В дождливые дни работы не проводятся. Сегодня ожидается дождь\n\n'
+                        if condition in ['wet-snow', 'light-snow', 'snow', 'snow-showers', 'hail', 'thunderstorm-with-hail' ]:
+                            if not work['conditions']['snow']:
+                                work_success = False
+                                addedText += 'В дни снегопада работы не проводятся. Сегодня ожидается снег\n\n'
+                        if not work_success:
+                            notify_bot.send_message(employer['link'], 'В связи с погодными условиями работы проводиться не будут.\n\nПояснение:\n' + addedText)
+                    except:
+                        continue
         time.sleep(1)
 
 if __name__ == "__main__":
